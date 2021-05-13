@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useMemo } from "react";
+// useMemo memoriza valor
 
 import ContentHeader from "../../components/ContentHeader";
 import SelectInput from "../../components/SelectInput";
@@ -6,7 +7,24 @@ import HistoryFinanceCard from "../../components/HistoryFinanceCard";
 
 import { Container, Content, Filters } from "./styles";
 
-const List: React.FC = () => {
+interface IRouteParams {
+  match: {
+    params: {
+      type: string;
+    };
+  }; //sequencia de acesso paramentros
+}
+
+const List: React.FC<IRouteParams> = ({ match }) => {
+  const { type } = match.params; //pegando a utl, destructor
+  const title = useMemo(() => {
+    return type === "entry-balance" ? "Entradas" : "Saídas";
+  }, [type]); //arrow function + paramentro variavel que sempre atualizar roda a funcao
+
+  const lineColor = useMemo(() => {
+    return type === "entry-balance" ? "#F7913B" : "#E44C4E";
+  }, []);
+
   const options = [
     { value: 7, label: "Julho" },
     { value: 8, label: "Agosto" },
@@ -22,7 +40,7 @@ const List: React.FC = () => {
 
   return (
     <Container>
-      <ContentHeader title="Saídas" lineColor="#E44C4E">
+      <ContentHeader title={title} lineColor={lineColor}>
         <SelectInput options={options} />
         <SelectInput options={years} />
       </ContentHeader>
