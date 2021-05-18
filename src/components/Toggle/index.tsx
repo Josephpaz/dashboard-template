@@ -1,16 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { Container, ToggleLabel, ToggleSelector } from "./styles";
 
 const Toggle: React.FC = () => {
+  const [activeSwitch, setActiveSwitch] = useState(false);
   return (
     <Container>
       <ToggleLabel>Light</ToggleLabel>
       <ToggleSelector
-        checked
+        checked={activeSwitch}
         uncheckedIcon={false}
         checkedIcon={false}
         onChange={() => {
-          console.log("mudou keks");
+          setActiveSwitch(!activeSwitch);
         }}
       />
       <ToggleLabel>Dark</ToggleLabel>

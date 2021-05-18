@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
+import { uuid } from "uuidv4";
 // useMemo memoriza valor
 
 import ContentHeader from "../../components/ContentHeader";
@@ -8,7 +9,7 @@ import gains from "../../repositories/gains";
 import expenses from "../../repositories/expenses";
 import formatCurrency from "../../utils/formatCurrency";
 import formatDate from "../../utils/formatDate";
-
+import linstOfMonths from "../../utils/months";
 import { Container, Content, Filters } from "./styles";
 
 interface IRouteParams {
@@ -31,6 +32,18 @@ interface IData {
 const List: React.FC<IRouteParams> = ({ match }) => {
   //use
   const [data, setData] = useState<IData[]>([]);
+  const [monthSelected, setMonthSelected] = useState<string>(
+    String(new Date().getMonth() + 1)
+  );
+  const [yearSelected, setYearSelected] = useState<string>(
+    String(new Date().getFullYear())
+  );
+
+  // const [selectedFrequency, setSelectedFrequency] = useState<string[]>([
+  //   "recorrente",
+  //   "eventual",
+  // ]);
+
   const { type } = match.params; //pegando a utl, destructor
   const title = useMemo(() => {
     return type === "entry-balance" ? "Entradas" : "Saídas";
@@ -44,47 +57,109 @@ const List: React.FC<IRouteParams> = ({ match }) => {
     return type === "entry-balance" ? gains : expenses;
   }, [type]);
 
-  const options = [
-    { value: 7, label: "Julho" },
-    { value: 8, label: "Agosto" },
-    { value: 9, label: "Setembro" },
-  ];
+  // const months = [
+  //   { value: 1, label: "Janeiro" },
+  //   { value: 5, label: "Maio" },
+  //   { value: 7, label: "Julho" },
+  // ];
 
-  const years = [
-    { value: 2021, label: 2021 },
-    { value: 2020, label: 2020 },
-    { value: 2019, label: 2019 },
-    { value: 2018, label: 2018 },
-  ];
+  const months = useMemo(() => {
+    return linstOfMonths.map((month, index) => {
+      return {
+        value: index + 1,
+        label: month,
+      };
+    });
+  }, []);
+
+  const years = useMemo(() => {
+    let uniqueYears: number[] = [];
+    listData.forEach((item) => {
+      const date = new Date(item.date);
+      const year = date.getFullYear();
+
+      //inclues() verifica se o elemento esta ou nao no array
+      if (!uniqueYears.includes(year)) {
+        uniqueYears.push(year);
+      }
+    });
+
+    return uniqueYears.map((year) => {
+      return {
+        value: year,
+        label: year,
+      };
+    });
+  }, [listData]);
+
+  // const handleFrequencyClick = (frequency: string) => {
+  //   const alreadySelected = selectedFrequency.findIndex(
+  //     (item) => item === frequency
+  //   );
+
+  //   if (alreadySelected >= 0) {
+  //     const filtered = selectedFrequency.filter((item) => item !== frequency);
+  //     setSelectedFrequency(filtered);
+  //   } else {
+  //     setSelectedFrequency((prev) => [...prev, frequency]);
+  //   }
+  // };
 
   useEffect(() => {
-    const response = listData.map((item) => {
+    const filteredDate = listData.filter((item) => {
+      const date = new Date(item.date);
+      const month = String(date.getMonth() + 1);
+      const year = String(date.getFullYear());
+
+      return month === monthSelected && year === yearSelected;
+    });
+
+    const formattedData = filteredDate.map((item) => {
       return {
-        id: Math.random() * data.length,
+        id: Number(uuid()),
         description: item.description,
         amountFormatted: formatCurrency(Number(item.amount)), //convertendo a string para tipo Number
         frequency: item.frequency,
         dataFormatted: formatDate(item.date),
-        tagColor: item.frequency === "recorrente" ? "#4E41f0" : "#E44C4E",
+        tagColor: item.frequency === "recorrente" ? "#E44C4E" : "#4E41f0",
       };
     });
-    setData(response);
-  }, []);
+    console.log(filteredDate);
+    setData(formattedData);
+  }, [listData, monthSelected, yearSelected]);
+
+  //
   //caso nao se coloque nenhuma variavel dentro do [] ele carregara uma vez a cada reload da pagina
   //caso tenha uma variavel ele disparará a funcao sempre que a variavel alterar seu valor
 
   return (
     <Container>
       <ContentHeader title={title} lineColor={lineColor}>
-        <SelectInput options={options} />
-        <SelectInput options={years} />
+        <SelectInput
+          options={months}
+          onChange={(event) => setMonthSelected(event.target.value)}
+          defaultValue={monthSelected}
+        />
+        <SelectInput
+          options={years}
+          onChange={(event) => setYearSelected(event.target.value)}
+          defaultValue={yearSelected}
+        />
       </ContentHeader>
 
       <Filters>
-        <button type="button" className="tag-filter tag-filter-recurrent">
+        <button
+          type="button"
+          // onClick={() => handleFrequencyClick("recorrente")}
+          className="tag-filter tag-filter-recurrent"
+        >
           RECORRENTES
         </button>
-        <button type="button" className="tag-filter tag-filter-eventual">
+        <button
+          type="button"
+          // onClick={() => handleFrequencyClick("eventual")}
+          className="tag-filter tag-filter-eventual"
+        >
           EVENTUAIS
         </button>
       </Filters>
