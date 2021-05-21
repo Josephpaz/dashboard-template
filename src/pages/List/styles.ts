@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const Container = styled.div``;
-export const Content = styled.div``;
+export const Content = styled.main``;
 
 export const Filters = styled.div`
   width: 100%;
@@ -15,7 +15,7 @@ export const Filters = styled.div`
     color: ${(props) => props.theme.colors.white};
     margin: 0 10px;
     transition: opacity 0.3s;
-    opacity: 0.5;
+    opacity: 0.4;
     &:hover {
       opacity: 0.7;
     }
@@ -40,5 +40,4 @@ export const Filters = styled.div`
   .tag-actived {
     opacity: 1;
   }
-
 `;

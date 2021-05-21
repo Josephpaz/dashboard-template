@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
-import { uuid } from "uuidv4";
+import { v4 as uuidv4 } from "uuid";
 // useMemo memoriza valor
 
 import ContentHeader from "../../components/ContentHeader";
@@ -9,7 +9,7 @@ import gains from "../../repositories/gains";
 import expenses from "../../repositories/expenses";
 import formatCurrency from "../../utils/formatCurrency";
 import formatDate from "../../utils/formatDate";
-import linstOfMonths from "../../utils/months";
+import listOfMonths from "../../utils/months";
 import { Container, Content, Filters } from "./styles";
 
 interface IRouteParams {
@@ -21,30 +21,31 @@ interface IRouteParams {
 }
 
 interface IData {
-  id: number;
+  id: string;
   description: string;
   amountFormatted: string;
   frequency: string;
-  dataFormatted: string;
+  dateFormatted: string;
   tagColor: string;
 }
 
 const List: React.FC<IRouteParams> = ({ match }) => {
   //use
   const [data, setData] = useState<IData[]>([]);
-  const [monthSelected, setMonthSelected] = useState<string>(
-    String(new Date().getMonth() + 1)
+  const [monthSelected, setMonthSelected] = useState<number>(
+    new Date().getMonth() + 1
   );
-  const [yearSelected, setYearSelected] = useState<string>(
-    String(new Date().getFullYear())
+  const [yearSelected, setYearSelected] = useState<number>(
+    new Date().getFullYear()
   );
 
-  // const [selectedFrequency, setSelectedFrequency] = useState<string[]>([
-  //   "recorrente",
-  //   "eventual",
-  // ]);
+  const [selectedFrequency, setSelectedFrequency] = useState([
+    "recorrente",
+    "eventual",
+  ]);
 
   const { type } = match.params; //pegando a utl, destructor
+
   const title = useMemo(() => {
     return type === "entry-balance" ? "Entradas" : "Saídas";
   }, [type]); //arrow function + paramentro variavel que sempre atualizar roda a funcao
@@ -57,14 +58,8 @@ const List: React.FC<IRouteParams> = ({ match }) => {
     return type === "entry-balance" ? gains : expenses;
   }, [type]);
 
-  // const months = [
-  //   { value: 1, label: "Janeiro" },
-  //   { value: 5, label: "Maio" },
-  //   { value: 7, label: "Julho" },
-  // ];
-
   const months = useMemo(() => {
-    return linstOfMonths.map((month, index) => {
+    return listOfMonths.map((month, index) => {
       return {
         value: index + 1,
         label: month,
@@ -92,41 +87,45 @@ const List: React.FC<IRouteParams> = ({ match }) => {
     });
   }, [listData]);
 
-  // const handleFrequencyClick = (frequency: string) => {
-  //   const alreadySelected = selectedFrequency.findIndex(
-  //     (item) => item === frequency
-  //   );
+  const handleFrequencyClick = (frequency: string) => {
+    const alreadySelected = selectedFrequency.findIndex(
+      (item) => item === frequency
+    );
 
-  //   if (alreadySelected >= 0) {
-  //     const filtered = selectedFrequency.filter((item) => item !== frequency);
-  //     setSelectedFrequency(filtered);
-  //   } else {
-  //     setSelectedFrequency((prev) => [...prev, frequency]);
-  //   }
-  // };
+    if (alreadySelected >= 0) {
+      const filtered = selectedFrequency.filter((item) => item !== frequency);
+      setSelectedFrequency(filtered);
+    } else {
+      setSelectedFrequency((prev) => [...prev, frequency]);
+    }
+  };
 
   useEffect(() => {
     const filteredDate = listData.filter((item) => {
       const date = new Date(item.date);
-      const month = String(date.getMonth() + 1);
-      const year = String(date.getFullYear());
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
 
-      return month === monthSelected && year === yearSelected;
+      return (
+        month === monthSelected &&
+        year === yearSelected &&
+        selectedFrequency.includes(item.frequency)
+      );
     });
 
     const formattedData = filteredDate.map((item) => {
       return {
-        id: Number(uuid()),
+        id: uuidv4(),
         description: item.description,
         amountFormatted: formatCurrency(Number(item.amount)), //convertendo a string para tipo Number
         frequency: item.frequency,
-        dataFormatted: formatDate(item.date),
+        dateFormatted: formatDate(item.date),
         tagColor: item.frequency === "recorrente" ? "#E44C4E" : "#4E41f0",
       };
     });
-    console.log(filteredDate);
+
     setData(formattedData);
-  }, [listData, monthSelected, yearSelected]);
+  }, [listData, monthSelected, yearSelected, data.length, selectedFrequency]);
 
   //
   //caso nao se coloque nenhuma variavel dentro do [] ele carregara uma vez a cada reload da pagina
@@ -137,12 +136,12 @@ const List: React.FC<IRouteParams> = ({ match }) => {
       <ContentHeader title={title} lineColor={lineColor}>
         <SelectInput
           options={months}
-          onChange={(event) => setMonthSelected(event.target.value)}
+          onChange={(event) => setMonthSelected(Number(event.target.value))}
           defaultValue={monthSelected}
         />
         <SelectInput
           options={years}
-          onChange={(event) => setYearSelected(event.target.value)}
+          onChange={(event) => setYearSelected(Number(event.target.value))}
           defaultValue={yearSelected}
         />
       </ContentHeader>
@@ -150,15 +149,19 @@ const List: React.FC<IRouteParams> = ({ match }) => {
       <Filters>
         <button
           type="button"
-          // onClick={() => handleFrequencyClick("recorrente")}
-          className="tag-filter tag-filter-recurrent"
+          className={`tag-filter 
+          tag-filter-recurrent
+          ${selectedFrequency.includes("eventual") && "tag-actived"}`}
+          onClick={() => handleFrequencyClick("recorrente")}
         >
           RECORRENTES
         </button>
         <button
           type="button"
-          // onClick={() => handleFrequencyClick("eventual")}
-          className="tag-filter tag-filter-eventual"
+          className={`tag-filter
+          tag-filter-eventual
+          ${selectedFrequency.includes("recorrente") && "tag-actived"}`}
+          onClick={() => handleFrequencyClick("eventual")}
         >
           EVENTUAIS
         </button>
@@ -170,7 +173,7 @@ const List: React.FC<IRouteParams> = ({ match }) => {
             key={item.id}
             tagColor={item.tagColor}
             title={item.description}
-            subtitle={item.dataFormatted}
+            subtitle={item.dateFormatted}
             amount={`${item.amountFormatted}`}
           />
         ))}
