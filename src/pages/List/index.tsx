@@ -51,7 +51,7 @@ const List: React.FC<IRouteParams> = ({ match }) => {
   }, [type]); //arrow function + paramentro variavel que sempre atualizar roda a funcao
 
   const lineColor = useMemo(() => {
-    return type === "entry-balance" ? "#F7913B" : "#E44C4E";
+    return type === "entry-balance" ? "#4E41F0" : "#E44C4E";
   }, [type]);
 
   const listData = useMemo(() => {
