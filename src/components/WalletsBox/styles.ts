@@ -34,4 +34,13 @@ export const Container = styled.div<IContainerProps>`
     position: absolute;
     bottom: 10px;
   }
+
+  .saldo-true {
+    color: #29c7ac;
+  }
+  
+  .saldo-false {
+    color: #f14e69;
+  }
+
 `;

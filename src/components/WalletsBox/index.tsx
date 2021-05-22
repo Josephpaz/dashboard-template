@@ -13,6 +13,7 @@ interface IWalletBoxProps {
   footerlabel: string;
   color: string;
   icon: "dolar" | "arrowUp" | "arrowDown";
+  isPositive?: boolean;
 }
 
 const WalletBox: React.FC<IWalletBoxProps> = ({
@@ -21,6 +22,7 @@ const WalletBox: React.FC<IWalletBoxProps> = ({
   footerlabel,
   color,
   icon,
+  isPositive
 }) => {
   const iconSelected = useMemo(() => {
     switch (icon) {
@@ -38,7 +40,7 @@ const WalletBox: React.FC<IWalletBoxProps> = ({
   return (
     <Container color={color}>
       <span>{title}</span>
-      <h1>
+      <h1 className={`saldo-${isPositive}`}>
         <CountUp
           end={amount}
           prefix={"R$ "}
