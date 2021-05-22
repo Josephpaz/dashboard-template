@@ -2,12 +2,16 @@ import React, { useState, useMemo, useEffect } from "react";
 import ContentHeader from "../../components/ContentHeader";
 import SelectInput from "../../components/SelectInput";
 import WalletBox from "../../components/WalletsBox";
+import MessageBox from "../../components/MessageBox";
 
 import { Container, Content } from "./styles";
 
 import expenses from "../../repositories/expenses";
 import gains from "../../repositories/gains";
 import listOfMonths from "../../utils/months";
+
+import happyImg from "../../assets/happy.svg";
+import sadImg from "../../assets/sad.svg";
 
 const Dashboard: React.FC = () => {
   const [monthSelected, setMonthSelected] = useState<number>(
@@ -84,6 +88,12 @@ const Dashboard: React.FC = () => {
           icon="arrowDown"
         />
       </Content>
+      <MessageBox
+        title={"Muito bem!"}
+        description={"Sua carteira está positiva!"}
+        footerText={"Continue assim. Considere investir seu saldo."}
+        icon={happyImg}
+      />
     </Container>
   );
 };
