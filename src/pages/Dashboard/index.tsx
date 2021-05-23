@@ -3,6 +3,7 @@ import ContentHeader from "../../components/ContentHeader";
 import SelectInput from "../../components/SelectInput";
 import WalletBox from "../../components/WalletsBox";
 import MessageBox from "../../components/MessageBox";
+import PieChartBox from "../../components/PieChartBox";
 
 import { Container, Content } from "./styles";
 
@@ -100,7 +101,7 @@ const Dashboard: React.FC = () => {
           "Verifique seus gastos e tente cortar algumas coisas desnecessárias.",
         icon: sadImg,
       };
-    } else if (totalBalance == 0) {
+    } else if (totalBalance === 0) {
       return {
         title: "Ufaa!",
         description: "Neste mês, exatamente o que ganhou",
@@ -116,6 +117,28 @@ const Dashboard: React.FC = () => {
       };
     }
   }, [totalBalance]);
+
+  const relationExpensesVersusGains = useMemo(() => {
+    const total = totalGains + totalExpenses;
+    const percentGains = (totalGains / total) * 100;
+    const percentExpenses = (totalExpenses / total) * 100;
+    const data = [
+      {
+        name: "Entradas",
+        value: totalGains,
+        percent: Number(percentGains.toFixed(1)),
+        color: "#E44C4E",
+      },
+      {
+        name: "Saídas",
+        value: totalExpenses,
+        percent: Number(percentExpenses.toFixed(1)),
+        color: "#F7931B",
+      },
+    ];
+
+    return data;
+  }, [totalGains, totalExpenses]);
 
   return (
     <Container>
@@ -155,13 +178,14 @@ const Dashboard: React.FC = () => {
           color="#E44C4E"
           icon="arrowDown"
         />
+        <MessageBox
+          title={message.title}
+          description={message.description}
+          footerText={message.footerText}
+          icon={message.icon}
+        />
+        <PieChartBox data={relationExpensesVersusGains} />
       </Content>
-      <MessageBox
-        title={message.title}
-        description={message.description}
-        footerText={message.footerText}
-        icon={message.icon}
-      />
     </Container>
   );
 };
