@@ -67,6 +67,6 @@ export default [
     amount: "2500.00",
     type: "entrada",
     frequency: "recorrente",
-    date: "2021-07-10",
+    date: "2019-07-10",
   },
 ];

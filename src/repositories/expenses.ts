@@ -340,6 +340,6 @@ export default [
     amount: "60.00",
     type: "saída",
     frequency: "eventual",
-    date: "2021-07-19",
+    date: "2019-07-19",
   },
 ];
