@@ -6,16 +6,10 @@ import Dashboard from "../pages/Dashboard";
 import List from "../pages/List";
 
 const AppRoutes: React.FC = () => {
-  // const routesSidebar = [
-  //   {
-  //     path: '/dash'
-  //   }
-  // ]
-  // retorna sempre um componente baseado na rota
   return (
     <Layout>
       <Switch>
-        <Route path="/dashboard" component={Dashboard} exact />
+        <Route path="/" exact component={Dashboard} />
         <Route path="/list/:type" component={List} />
       </Switch>
     </Layout> 
