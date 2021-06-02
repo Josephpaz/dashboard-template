@@ -32,7 +32,7 @@ export const Container = styled.div<IContainerProps>`
 
   position: relative;
   overflow: hidden;
-  animation: ${animate} .5s;
+  animation: ${animate} 0.5s;
 
   > img {
     position: absolute;
@@ -59,5 +59,20 @@ export const Container = styled.div<IContainerProps>`
 
   .saldo-false {
     color: #f14e69;
+  }
+
+  @media (max-width: 770px) {
+    > span {
+      font-size: 14px;
+    }
+
+    > h1 {
+      word-wrap: break-word;
+      font-size: 22px;
+    }
+  }
+
+  @media (max-width: 420px) {
+    width: 100%;
   }
 `;
